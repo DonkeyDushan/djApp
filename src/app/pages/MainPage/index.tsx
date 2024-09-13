@@ -1,8 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Box, IconButton, Stack } from '@mui/material';
 import styles from './index.module.css';
-import AudioButton from 'app/components/AudioButton copy';
+import AudioButton from 'app/components/AudioButton';
 import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
 
 export const MainPage = () => {

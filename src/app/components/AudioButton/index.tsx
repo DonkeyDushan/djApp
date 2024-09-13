@@ -1,20 +1,19 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { PauseCircle, PlayArrowRounded, StopCircleRounded } from '@mui/icons-material';
 import { Checkbox, IconButton, Stack } from '@mui/material';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 type Types = {
   text: string;
-  src: string;
   checked: boolean;
   /*  check: (checked: string) => void; */
   onClick: () => void;
+  audio: HTMLAudioElement;
 };
 
-const AudioButton = ({ text, src, checked, onClick }: Types) => {
+const AudioButton = ({ text, checked, onClick, audio }: Types) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const [paused, setPaused] = useState(true);
-  const audio = useMemo(() => new Audio(`${src}.wav`), [src]);
 
   const start = () => {
     audio.play();

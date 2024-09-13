@@ -1,6 +1,6 @@
 {
-  "name": "sipkovana",
-  "homepage": "https://donkeydushan.github.io/sipkovana/",
+  "name": "dj_app",
+  "homepage": "https://donkeydushan.github.io/djApp/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,13 +9,15 @@
     "build": "tsc && vite build",
     "format": "prettier --write \"src/**/*.[jt]s{,x}\"",
     "lint": "tsc --noEmit && eslint \"src/**/*.[jt]s{,x}\"",
-    "predeploy": "yarn build"
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d dist && rm -r dist/"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^6.1.0",
     "@mui/material": "^5.14.0",
+    "gh-pages": "^6.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sass": "^1.77.8"
