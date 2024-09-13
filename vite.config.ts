@@ -9,6 +9,7 @@ export default defineConfig({
     outDir: 'dist',
     target: 'esnext',
   },
+  publicDir: 'assets',
   resolve: {
     alias: {
       app: '/src/app',
