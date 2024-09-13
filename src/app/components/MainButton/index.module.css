@@ -1,0 +1,11 @@
+.root {
+    height: 5rem;
+    width: 5rem;
+    border-radius: 100%;
+    box-shadow: none;
+
+    &:hover {
+       outline: 8px solid;
+       box-shadow: none;
+    }
+}

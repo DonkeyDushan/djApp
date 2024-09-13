@@ -1,0 +1,2 @@
+# sipkovana
+Appka pro šipkovanou

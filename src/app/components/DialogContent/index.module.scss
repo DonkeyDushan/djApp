@@ -1,0 +1,32 @@
+
+.dialog {
+    > div > div {
+        overflow: visible;
+        width: 80vw;
+        max-width: 420px;
+        padding: 24px;
+        border-radius: 42px;
+        display: grid;
+        gap: 16px; 
+    }
+}
+
+.textField {
+    > div {
+        border-radius: 16px;
+    }
+}
+
+.buttonsWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.instructions {
+    text-align: center;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}

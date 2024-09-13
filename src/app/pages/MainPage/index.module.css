@@ -1,0 +1,18 @@
+.root {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #241b2f;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+
+    @media only screen and (max-width: 420px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
