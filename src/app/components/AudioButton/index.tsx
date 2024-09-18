@@ -6,21 +6,13 @@ import React, { useState } from 'react';
 type Types = {
   text: string;
   checked: boolean;
-  /*  check: (checked: string) => void; */
   onClick: () => void;
   audio: HTMLAudioElement;
 };
 
 const AudioButton = ({ text, checked, onClick, audio }: Types) => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const [paused, setPaused] = useState(true);
-
-  const start = () => {
-    audio.play();
-  };
-  const pause = () => {
-    audio.pause();
-  };
+  console.log(text, checked);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
@@ -33,15 +25,19 @@ const AudioButton = ({ text, checked, onClick, audio }: Types) => {
         <IconButton
           onClick={() => {
             if (!audio.paused) {
-              pause();
+              audio.pause();
               setPaused(true);
             } else {
-              start();
+              audio.play();
               setPaused(false);
             }
           }}
         >
-          {paused ? <PlayArrowRounded fontSize={'large'} /> : <PauseCircle fontSize={'large'} />}
+          {(!checked && paused) || audio.paused ? (
+            <PlayArrowRounded fontSize={'large'} />
+          ) : (
+            <PauseCircle fontSize={'large'} />
+          )}
         </IconButton>
       </Stack>
     </Stack>

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, IconButton, Stack } from '@mui/material';
+import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
 import styles from './index.module.css';
 import AudioButton from 'app/components/AudioButton';
-import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
+import { InfoOutlined, PauseCircle, PlayArrowRounded } from '@mui/icons-material';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -29,6 +29,10 @@ export const MainPage = () => {
   const pad1 = useMemo(() => new Audio(`Anodic_Pad1.wav`), []);
   const pad2 = useMemo(() => new Audio(`Anodic_Pad2.wav`), []);
   const pad3 = useMemo(() => new Audio(`Anodic_Pad3.wav`), []);
+  // Custom
+  const custom1 = useMemo(() => new Audio(`Custom1.mp3`), []);
+  const custom2 = useMemo(() => new Audio(`Custom2.mp3`), []);
+  const custom3 = useMemo(() => new Audio(`Custom3.mp3`), []);
 
   const bassList = useMemo(
     () => [
@@ -72,6 +76,16 @@ export const MainPage = () => {
     ],
     [pad1, pad2, pad3],
   );
+  const customList = useMemo(
+    () => [
+      { text: 'Custom Sound 1', src: 'Custom1', audio: custom1 },
+      { text: 'Custom Sound 2', src: 'Custom2', audio: custom2 },
+      { text: 'Custom Sound 3', src: 'Custom3', audio: custom3 },
+    ],
+    [custom1, custom2, custom3],
+  );
+
+  const audioLists = [bassList, drumsList, keysList, arpList, padList, customList];
 
   const getAllAudio = () => {
     const checked = [
@@ -80,6 +94,7 @@ export const MainPage = () => {
       ...drumsList.filter((item) => checkedValues.includes(item.src)),
       ...arpList.filter((item) => checkedValues.includes(item.src)),
       ...padList.filter((item) => checkedValues.includes(item.src)),
+      ...customList.filter((item) => checkedValues.includes(item.src)),
     ];
     const checkedAudio = checked.map((item) => item.audio);
     return checkedAudio;
@@ -90,8 +105,9 @@ export const MainPage = () => {
     [bassList, drumsList, keysList, arpList, padList, checkedValues],
   );
 
-  const playAll = () => {
+  const playAll = ({ zeroTime }: { zeroTime?: boolean }) => {
     allAudio.forEach((audio) => {
+      if (zeroTime) audio.currentTime = 0;
       audio?.play();
     });
 
@@ -113,26 +129,16 @@ export const MainPage = () => {
     });
   };
 
-  const handleCheck = ({
-    key,
-    audio,
-    values = checkedValues,
-    setValues = setCheckedValues,
-  }: {
-    key: string;
-    audio: HTMLAudioElement;
-    values?: string[];
-    setValues?: (values: string[]) => void;
-  }) => {
-    if (values.includes(key)) {
-      const newValues = values.filter((v: string) => v !== key);
-      setValues(newValues);
+  const handleCheck = ({ key, audio }: { key: string; audio: HTMLAudioElement }) => {
+    if (checkedValues.includes(key)) {
+      const newValues = checkedValues.filter((v: string) => v !== key);
+      setCheckedValues(newValues);
       audio.pause();
       audio.currentTime = 0;
     } else {
-      setValues([...values, key]);
+      setCheckedValues([...checkedValues, key]);
       const playingAudio = allAudio.find((a) => !a.paused);
-      const currentTime = playingAudio ? playingAudio.currentTime : 0;
+      const currentTime = playingAudio && !key.includes('Custom') ? playingAudio.currentTime : 0;
       audio.currentTime = currentTime;
       if (isPlaying) {
         audio.play();
@@ -140,23 +146,39 @@ export const MainPage = () => {
     }
   };
 
-  const handleLoopAudio = (audio: HTMLAudioElement) => {
-    audio.addEventListener('ended', () => {
-      console.log(audio.src, 'ended');
-      allAudio.forEach((a) => {
-        if (a) {
-          a.currentTime = 0;
-          a.play();
-        }
-      });
-    });
-  };
-  bassList.forEach(({ audio }) => handleLoopAudio(audio));
-  drumsList.forEach(({ audio }) => handleLoopAudio(audio));
-  keysList.forEach(({ audio }) => handleLoopAudio(audio));
-  arpList.forEach(({ audio }) => handleLoopAudio(audio));
-  padList.forEach(({ audio }) => handleLoopAudio(audio));
+  /*   const checkIsChecked = (src: string, checked: string[]) => {
+    const audioTitle = src.split('/')[3].split('.')[0];
+    return checked.includes(audioTitle);
+  }; */
 
+  /* const handleLoopAudio = useCallback(
+    (audio: HTMLAudioElement) => {
+      const checked = checkIsChecked(audio.src, checkedValues);
+      console.log(audio.src, checked);
+
+      const loopAudio = () => {
+        if (checked) {
+          if (!audio.src.includes('Custom')) {
+            allAudio.forEach((a) => {
+              if (a) {
+                a.currentTime = 0;
+                a.play();
+              }
+            });
+          } else {
+            audio.currentTime = 0;
+            audio.play();
+          }
+        }
+      };
+      audio.removeEventListener('ended', loopAudio);
+      if (checkedValues.includes(audio.src.split('/')[3].split('.')[0])) {
+        audio.addEventListener('ended', loopAudio);
+      }
+    },
+    [checkedValues],
+  );
+ */
   const saveCheckedValuesToLocalStorage = () => {
     localStorage.setItem('checkedAudioValues', JSON.stringify(checkedValues));
   };
@@ -172,7 +194,13 @@ export const MainPage = () => {
     <Box className={styles.root}>
       <Box className={styles.window}>
         <Box className={styles.header}>
-          <h2>{'Audio mixing tool'}</h2>
+          <Stack direction={'row'} justifyContent={'space-between'}>
+            <h2>{'Audio mixing tool'}</h2>
+            <Tooltip title={'Test'}>
+              <InfoOutlined />
+            </Tooltip>
+          </Stack>
+
           <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
             <Button onClick={saveCheckedValuesToLocalStorage} className={styles.headerButton}>
               Save
@@ -187,74 +215,40 @@ export const MainPage = () => {
               }}
               className={styles.headerButton}
             >
+              Clear all
+            </Button>
+            <Button
+              onClick={() => {
+                location.reload();
+              }}
+              className={styles.headerButton}
+            >
               Restart
             </Button>
           </Stack>
         </Box>
         <Box className={styles.content}>
-          <Box className={styles.grid}>
-            {drumsList.map(({ text, src, audio }) => (
-              <AudioButton
-                key={src}
-                text={text}
-                checked={checkedValues.includes(src)}
-                audio={audio}
-                onClick={() => handleCheck({ key: src, audio: audio })}
-              />
-            ))}
-          </Box>
-          <Box className={styles.grid}>
-            {bassList.map(({ text, src, audio }) => (
-              <AudioButton
-                key={src}
-                text={text}
-                audio={audio}
-                checked={checkedValues.includes(src)}
-                onClick={() => handleCheck({ key: src, audio: audio })}
-              />
-            ))}
-          </Box>
-          <Box className={styles.grid}>
-            {keysList.map(({ text, src, audio }) => (
-              <AudioButton
-                key={src}
-                text={text}
-                audio={audio}
-                checked={checkedValues.includes(src)}
-                onClick={() => handleCheck({ key: src, audio: audio })}
-              />
-            ))}
-          </Box>
-          <Box className={styles.grid}>
-            {arpList.map(({ text, src, audio }) => (
-              <AudioButton
-                key={src}
-                text={text}
-                audio={audio}
-                checked={checkedValues.includes(src)}
-                onClick={() => handleCheck({ key: src, audio: audio })}
-              />
-            ))}
-          </Box>
-          <Box className={styles.grid}>
-            {padList.map(({ text, src, audio }) => (
-              <AudioButton
-                key={src}
-                text={text}
-                audio={audio}
-                checked={checkedValues.includes(src)}
-                onClick={() => handleCheck({ key: src, audio: audio })}
-              />
-            ))}
-          </Box>
+          {audioLists.map((list, i) => (
+            <Box key={`audioList-${i}`} className={styles.grid}>
+              {list.map(({ text, src, audio }) => (
+                <AudioButton
+                  key={src}
+                  text={text}
+                  checked={checkedValues.includes(src)}
+                  audio={audio}
+                  onClick={() => handleCheck({ key: src, audio: audio })}
+                />
+              ))}
+            </Box>
+          ))}
           <Stack direction={'row'} justifyContent={'center'} sx={{ padding: '12px' }}>
             <IconButton
               onClick={() => {
                 if (isPlaying) {
                   stopAll();
                   setIsPlaying(false);
-                } else {
-                  playAll();
+                } else if (checkedValues) {
+                  playAll({ zeroTime: false });
                 }
               }}
               className={styles.playButton}
