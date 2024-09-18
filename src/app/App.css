@@ -21,3 +21,7 @@ body {
   margin: 0;
   background-color: #241b2f;
 }
+
+.MuiButtonBase-root {
+  font-family: 'Courier New', monospace !important;
+}

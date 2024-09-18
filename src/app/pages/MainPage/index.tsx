@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Button, IconButton, Stack } from '@mui/material';
 import styles from './index.module.css';
 import AudioButton from 'app/components/AudioButton';
-import { PauseCircle, PlayArrowRounded, RestartAltRounded } from '@mui/icons-material';
+import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -101,7 +101,7 @@ export const MainPage = () => {
   useEffect(() => {
     if (allAudio.filter((n) => n).length === 0) {
       setIsPlaying(false);
-    } /* else if (isPlaying) playAll(); */
+    }
   }, [allAudio]);
 
   const stopAll = () => {
@@ -143,8 +143,12 @@ export const MainPage = () => {
   const handleLoopAudio = (audio: HTMLAudioElement) => {
     audio.addEventListener('ended', () => {
       console.log(audio.src, 'ended');
-      audio.currentTime = 0; // Reset to the beginning
-      audio.play(); // Play again
+      allAudio.forEach((a) => {
+        if (a) {
+          a.currentTime = 0;
+          a.play();
+        }
+      });
     });
   };
   bassList.forEach(({ audio }) => handleLoopAudio(audio));
@@ -168,12 +172,23 @@ export const MainPage = () => {
     <Box className={styles.root}>
       <Box className={styles.window}>
         <Box className={styles.header}>
-          <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-            {'Audio mixing tool'}
-            <Stack direction={'row'} gap={'24px'}>
-              <Button onClick={saveCheckedValuesToLocalStorage}>Save</Button>
-              <Button onClick={loadCheckedValuesFromLocalStorage}>Load saved mix</Button>
-            </Stack>
+          <h2>{'Audio mixing tool'}</h2>
+          <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
+            <Button onClick={saveCheckedValuesToLocalStorage} className={styles.headerButton}>
+              Save
+            </Button>
+            <Button onClick={loadCheckedValuesFromLocalStorage} className={styles.headerButton}>
+              Load saved mix
+            </Button>
+            <Button
+              onClick={() => {
+                setCheckedValues([]);
+                stopAll();
+              }}
+              className={styles.headerButton}
+            >
+              Restart
+            </Button>
           </Stack>
         </Box>
         <Box className={styles.content}>
@@ -242,6 +257,7 @@ export const MainPage = () => {
                   playAll();
                 }
               }}
+              className={styles.playButton}
               sx={{ width: 'fit-content' }}
             >
               {isPlaying ? (
@@ -249,16 +265,6 @@ export const MainPage = () => {
               ) : (
                 <PlayArrowRounded fontSize={'large'} />
               )}
-            </IconButton>
-
-            <IconButton
-              onClick={() => {
-                setCheckedValues([]);
-                stopAll();
-              }}
-              sx={{ width: 'fit-content' }}
-            >
-              {<RestartAltRounded fontSize={'large'} />}
             </IconButton>
           </Stack>
         </Box>

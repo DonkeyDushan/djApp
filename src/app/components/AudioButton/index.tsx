@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
-import { Checkbox, IconButton, Stack } from '@mui/material';
+import { Box, Checkbox, IconButton, Stack } from '@mui/material';
 import React, { useState } from 'react';
 
 type Types = {
@@ -21,18 +21,14 @@ const AudioButton = ({ text, checked, onClick, audio }: Types) => {
   const pause = () => {
     audio.pause();
   };
-  /*   const stop = () => {
-    audio.pause();
-    audio.currentTime = 0;
-  }; */
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
       <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-        <span>
-          <Checkbox checked={checked} onClick={onClick} />
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'auto auto', alignItems: 'center' }}>
+          <Checkbox checked={checked} onClick={onClick} sx={{ svg: { color: '#3267f4' } }} />
           {text}
-        </span>
+        </Box>
 
         <IconButton
           onClick={() => {
@@ -47,16 +43,6 @@ const AudioButton = ({ text, checked, onClick, audio }: Types) => {
         >
           {paused ? <PlayArrowRounded fontSize={'large'} /> : <PauseCircle fontSize={'large'} />}
         </IconButton>
-        {/*  {!paused && (
-          <IconButton
-            onClick={() => {
-              setPaused(true);
-              stop();
-            }}
-          >
-            <StopCircleRounded fontSize={'large'} />
-          </IconButton>
-        )} */}
       </Stack>
     </Stack>
   );

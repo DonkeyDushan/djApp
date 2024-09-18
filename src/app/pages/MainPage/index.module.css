@@ -1,24 +1,50 @@
 .root {
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #241b2f;
+    background-color: #241b2f;   
+
+    @media only screen and (max-width: 420px) {
+        padding: 12px;
+    }
 }
 
 .header {
     width: 100%;
     font-size: 1rem;
-    padding: 6px 12px;
+    padding: 12px 24px;
     background-color: #b4b4b4;
     color: #000;
     border-bottom: 2px ridge #7d7d7d;
     font-weight: 600;
+    align-items: center;
+    justifyContent: space-between;
 
-    & > button {
-        font-weight: 600;
-        font-family: 'Courier New', monospace;
+    h2 {
+        margin: 0;
+    }
+}
+
+.headerButton {
+    margin: 0;
+    height: fit-content;
+    font-size: 1.2rem;
+    lineHeight: 1;
+    font-weight: 600;
+    color: #3267f4;
+    text-decoration: underline;
+
+    &:hover {
+        color: rgba(227, 61, 148, 1);
+        text-decoration: overline;
+        background-color: transparent;
+    }
+
+    @media only screen and (max-width: 420px) {
+        font-size: 1rem;
     }
 }
 
@@ -33,6 +59,9 @@
 
 .content {
     padding: 24px;
+    @media only screen and (max-width: 420px) {
+        padding: 12px;
+    }
 }
 
 .grid {
@@ -42,7 +71,20 @@
     row-gap: 1.5rem;
     margin-bottom: 2rem;
 
-    @media only screen and (max-width: 420px) {
+    @media only screen and (max-width: 630px) {
         grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
+        row-gap: 12px;
+    }
+}
+
+.playButton {
+    &:hover {
+        background-color: rgba(227, 61, 148, 0.2);
+    }
+    & > svg {
+        color: rgba(227, 61, 148, 1);
+        width: 100px;
+        height: 100px;
     }
 }
