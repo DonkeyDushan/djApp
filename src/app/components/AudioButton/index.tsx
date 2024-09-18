@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { PauseCircle, PlayArrowRounded, StopCircleRounded } from '@mui/icons-material';
+import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
 import { Checkbox, IconButton, Stack } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -21,16 +21,18 @@ const AudioButton = ({ text, checked, onClick, audio }: Types) => {
   const pause = () => {
     audio.pause();
   };
-  const stop = () => {
+  /*   const stop = () => {
     audio.pause();
     audio.currentTime = 0;
-  };
+  }; */
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
-      <Stack direction={'row'} alignItems={'center'}>
-        <Checkbox checked={checked} onClick={onClick} />
-        {text}
+      <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+        <span>
+          <Checkbox checked={checked} onClick={onClick} />
+          {text}
+        </span>
 
         <IconButton
           onClick={() => {
@@ -43,18 +45,18 @@ const AudioButton = ({ text, checked, onClick, audio }: Types) => {
             }
           }}
         >
-          {paused ? <PlayArrowRounded /> : <PauseCircle />}
+          {paused ? <PlayArrowRounded fontSize={'large'} /> : <PauseCircle fontSize={'large'} />}
         </IconButton>
-        {!paused && (
+        {/*  {!paused && (
           <IconButton
             onClick={() => {
               setPaused(true);
               stop();
             }}
           >
-            <StopCircleRounded />
+            <StopCircleRounded fontSize={'large'} />
           </IconButton>
-        )}
+        )} */}
       </Stack>
     </Stack>
   );

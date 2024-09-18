@@ -4,7 +4,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, IconButton, Stack } from '@mui/material';
 import styles from './index.module.css';
 import AudioButton from 'app/components/AudioButton';
-import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
+import {
+  PauseCircle,
+  PlayArrowRounded,
+  RefreshRounded,
+  RestartAltRounded,
+} from '@mui/icons-material';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -101,7 +106,7 @@ export const MainPage = () => {
   useEffect(() => {
     if (allAudio.filter((n) => n).length === 0) {
       setIsPlaying(false);
-    } else if (isPlaying) playAll();
+    } /* else if (isPlaying) playAll(); */
   }, [allAudio]);
 
   const stopAll = () => {
@@ -151,16 +156,19 @@ export const MainPage = () => {
       setValues([...values, key]);
       const currentTime = allAudio[0]?.currentTime || 0;
       audio.currentTime = currentTime;
+      if (isPlaying) {
+        audio.play();
+      }
     }
   };
 
   useEffect(() => {
     const handleLoopAudio = (audio: HTMLAudioElement, src: string) => {
       audio.addEventListener('ended', () => {
-        if (checkedValues.includes(src)) {
-          audio.currentTime = 0; // Reset to the beginning
-          audio.play(); // Play again
-        }
+        /*  if (checkedValues.includes(src)) { */
+        audio.currentTime = 0; // Reset to the beginning
+        audio.play(); // Play again
+        /*  } */
       });
     };
 
@@ -241,7 +249,7 @@ export const MainPage = () => {
               />
             ))}
           </Box>
-          <Stack sx={{ padding: '12px' }}>
+          <Stack direction={'row'} justifyContent={'center'} sx={{ padding: '12px' }}>
             <IconButton
               onClick={() => {
                 if (isPlaying) {
@@ -251,9 +259,23 @@ export const MainPage = () => {
                   playAll();
                 }
               }}
-              sx={{ width: 'fit-content', alignSelf: 'center' }}
+              sx={{ width: 'fit-content' }}
             >
-              {isPlaying ? <PauseCircle /> : <PlayArrowRounded />}
+              {isPlaying ? (
+                <PauseCircle fontSize={'large'} />
+              ) : (
+                <PlayArrowRounded fontSize={'large'} />
+              )}
+            </IconButton>
+
+            <IconButton
+              onClick={() => {
+                setCheckedValues([]);
+                stopAll();
+              }}
+              sx={{ width: 'fit-content' }}
+            >
+              {<RestartAltRounded fontSize={'large'} />}
             </IconButton>
           </Stack>
         </Box>
