@@ -170,7 +170,7 @@ export const MainPage = () => {
         <Box className={styles.header}>
           <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
             {'Audio mixing tool'}
-            <Stack direction={'row'}>
+            <Stack direction={'row'} gap={'24px'}>
               <Button onClick={saveCheckedValuesToLocalStorage}>Save</Button>
               <Button onClick={loadCheckedValuesFromLocalStorage}>Load saved mix</Button>
             </Stack>
