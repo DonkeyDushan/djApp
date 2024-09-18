@@ -1,15 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, IconButton, Stack } from '@mui/material';
+import { Box, Button, IconButton, Stack } from '@mui/material';
 import styles from './index.module.css';
 import AudioButton from 'app/components/AudioButton';
-import {
-  PauseCircle,
-  PlayArrowRounded,
-  RefreshRounded,
-  RestartAltRounded,
-} from '@mui/icons-material';
+import { PauseCircle, PlayArrowRounded, RestartAltRounded } from '@mui/icons-material';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -118,24 +113,6 @@ export const MainPage = () => {
     });
   };
 
-  /*   const handleCheck = ({
-    key,
-    values = checkedValues,
-    setValues = setCheckedValues,
-  }: {
-    key: string;
-    values?: string[];
-    setValues?: (values: string[]) => void;
-  }) => {
-    stopAll();
-    if (values.includes(key)) {
-      const newValues = values.filter((v: string) => v !== key);
-      setValues(newValues);
-    } else {
-      setValues([...values, key]);
-    }
-  }; */
-
   const handleCheck = ({
     key,
     audio,
@@ -154,7 +131,8 @@ export const MainPage = () => {
       audio.currentTime = 0;
     } else {
       setValues([...values, key]);
-      const currentTime = allAudio[0]?.currentTime || 0;
+      const playingAudio = allAudio.find((a) => !a.paused);
+      const currentTime = playingAudio ? playingAudio.currentTime : 0;
       audio.currentTime = currentTime;
       if (isPlaying) {
         audio.play();
@@ -162,37 +140,42 @@ export const MainPage = () => {
     }
   };
 
-  useEffect(() => {
-    const handleLoopAudio = (audio: HTMLAudioElement, src: string) => {
-      audio.addEventListener('ended', () => {
-        /*  if (checkedValues.includes(src)) { */
-        audio.currentTime = 0; // Reset to the beginning
-        audio.play(); // Play again
-        /*  } */
-      });
-    };
+  const handleLoopAudio = (audio: HTMLAudioElement) => {
+    audio.addEventListener('ended', () => {
+      console.log(audio.src, 'ended');
+      audio.currentTime = 0; // Reset to the beginning
+      audio.play(); // Play again
+    });
+  };
+  bassList.forEach(({ audio }) => handleLoopAudio(audio));
+  drumsList.forEach(({ audio }) => handleLoopAudio(audio));
+  keysList.forEach(({ audio }) => handleLoopAudio(audio));
+  arpList.forEach(({ audio }) => handleLoopAudio(audio));
+  padList.forEach(({ audio }) => handleLoopAudio(audio));
 
-    // Apply listeners for each audio file
-    bassList.forEach(({ audio, src }) => handleLoopAudio(audio, src));
-    drumsList.forEach(({ audio, src }) => handleLoopAudio(audio, src));
-    keysList.forEach(({ audio, src }) => handleLoopAudio(audio, src));
-    arpList.forEach(({ audio, src }) => handleLoopAudio(audio, src));
-    padList.forEach(({ audio, src }) => handleLoopAudio(audio, src));
-
-    // Cleanup function to remove listeners
-    return () => {
-      bassList.forEach(({ audio }) => audio.removeEventListener('ended', () => {}));
-      drumsList.forEach(({ audio }) => audio.removeEventListener('ended', () => {}));
-      keysList.forEach(({ audio }) => audio.removeEventListener('ended', () => {}));
-      arpList.forEach(({ audio }) => audio.removeEventListener('ended', () => {}));
-      padList.forEach(({ audio }) => audio.removeEventListener('ended', () => {}));
-    };
-  }, [checkedValues, bassList, drumsList, keysList, arpList, padList]);
+  const saveCheckedValuesToLocalStorage = () => {
+    localStorage.setItem('checkedAudioValues', JSON.stringify(checkedValues));
+  };
+  const loadCheckedValuesFromLocalStorage = () => {
+    setCheckedValues([]);
+    stopAll();
+    setIsPlaying(false);
+    const savedValues = JSON.parse(localStorage.getItem('checkedAudioValues') || '');
+    setCheckedValues(savedValues || []);
+  };
 
   return (
     <Box className={styles.root}>
       <Box className={styles.window}>
-        <Box className={styles.header}>Audio mixing tool</Box>
+        <Box className={styles.header}>
+          <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+            {'Audio mixing tool'}
+            <Stack direction={'row'}>
+              <Button onClick={saveCheckedValuesToLocalStorage}>Save</Button>
+              <Button onClick={loadCheckedValuesFromLocalStorage}>Load saved mix</Button>
+            </Stack>
+          </Stack>
+        </Box>
         <Box className={styles.content}>
           <Box className={styles.grid}>
             {drumsList.map(({ text, src, audio }) => (
