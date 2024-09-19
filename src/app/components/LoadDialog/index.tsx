@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { CloseOutlined, DeleteOutline } from '@mui/icons-material';
-import { Button, IconButton, Stack } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import styles from 'app/pages/MainPage/index.module.css';
 
 const style = {
