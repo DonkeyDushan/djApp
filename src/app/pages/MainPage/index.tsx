@@ -33,6 +33,7 @@ import InfoDialog from 'app/components/InfoDialog';
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [sliders, setSliders] = useState<{ src: string; volume: number; rate: number }[]>([]);
 
   const audioList = useMemo(
     () => [
@@ -100,15 +101,35 @@ export const MainPage = () => {
       }
     }
   };
-
   const saveCheckedValuesToLocalStorage = () => {
     localStorage.setItem('checkedAudioValues', JSON.stringify(checkedValues));
+    localStorage.setItem(
+      'sliders',
+      JSON.stringify(
+        allAudio.map((audio, i) => ({
+          src: audioList[i].src,
+          volume: audio.volume(),
+          rate: audio.rate(),
+        })),
+      ),
+    );
   };
+
   const loadCheckedValuesFromLocalStorage = () => {
     stopAll();
     setIsPlaying(false);
-    const savedValues = JSON.parse(localStorage.getItem('checkedAudioValues') || '');
+
+    const savedValues = JSON.parse(localStorage.getItem('checkedAudioValues') || '[]');
+    const savedSliders = JSON.parse(localStorage.getItem('sliders') || '[]');
+
     setCheckedValues(savedValues || []);
+
+    if (Array.isArray(savedSliders) && savedSliders.length > 0) {
+      setSliders(savedSliders);
+    } else {
+      console.error('Invalid sliders data loaded');
+      setSliders([]); // Set default value if something is wrong
+    }
   };
 
   const handleLoopAudio = (audio: Howl, src: string) => {
@@ -165,6 +186,7 @@ export const MainPage = () => {
               onClick={() => {
                 setCheckedValues([]);
                 stopAll();
+                setSliders([]);
               }}
               className={styles.headerButton}
             >
@@ -188,6 +210,7 @@ export const MainPage = () => {
                 checked={checkedValues.includes(audioObject.src)}
                 audioObject={audioObject}
                 onClick={() => handleCheck({ key: audioObject.src, audio: audioObject.audio })}
+                sliders={sliders.find((slider) => slider.src === audioObject.src)}
               />
             ))}
           </Box>
