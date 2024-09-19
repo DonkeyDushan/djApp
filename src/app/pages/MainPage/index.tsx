@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
+import { Box, Button, IconButton, Stack } from '@mui/material';
 import styles from './index.module.css';
 import AudioButton from 'app/components/AudioButton';
-import { InfoOutlined, PauseCircle, PlayArrowRounded } from '@mui/icons-material';
+import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
 import { Howler } from 'howler';
 import {
   anodicDrums1,
@@ -28,6 +28,7 @@ import {
   pad2,
   pad3,
 } from './sounds';
+import InfoDialog from 'app/components/InfoDialog';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -113,7 +114,8 @@ export const MainPage = () => {
   const handleLoopAudio = (audio: Howl, src: string) => {
     if (checkedValues.includes(src)) {
       if (!src.includes('Custom')) {
-        /* stopAll(); */
+        console.log('looping our audio', src);
+        Howler.stop();
         playAll({ zeroTime: true });
       } else {
         audio.seek(0);
@@ -149,9 +151,7 @@ export const MainPage = () => {
         <Box className={styles.header}>
           <Stack direction={'row'} justifyContent={'space-between'}>
             <h2>{'Audio mixing tool'}</h2>
-            <Tooltip title={'Test'}>
-              <InfoOutlined />
-            </Tooltip>
+            <InfoDialog />
           </Stack>
 
           <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
