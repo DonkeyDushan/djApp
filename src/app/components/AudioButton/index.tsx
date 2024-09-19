@@ -14,41 +14,31 @@ type Types = {
 const AudioButton = ({ audioObject, checked, onClick, handleLoopAudio }: Types) => {
   const { audio, text, src } = audioObject;
   const [paused, setPaused] = useState(true);
-
   useEffect(() => {
+    const handlePlay = () => setPaused(false);
+    const handlePause = () => setPaused(true);
     const handleEnd = () => {
       if (!src.includes('Custom') && checked) {
         handleLoopAudio(audio, src);
-      } else {
-        setPaused(true);
       }
     };
 
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnd);
-    audio.addEventListener('paused', () => {
-      setPaused(true);
-    });
-    audio.addEventListener('play', () => {
-      setPaused(false);
-    });
+
     return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('ended', handleEnd);
-      audio.removeEventListener('paused', handleEnd);
-      audio.removeEventListener('play', handleEnd);
     };
   }, [audio, checked, handleLoopAudio, src]);
 
   useEffect(() => {
     audio.loop = checked && audio.src.includes('Custom');
-    if (!checked) setPaused(true);
+    if (!checked) audio.pause();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked]);
-
-  useEffect(() => {
-    if (paused) audio.pause();
-    if (!paused) audio.play();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused]);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
@@ -61,9 +51,9 @@ const AudioButton = ({ audioObject, checked, onClick, handleLoopAudio }: Types) 
         <IconButton
           onClick={() => {
             if (paused) {
-              setPaused(false);
+              audio.play();
             } else {
-              setPaused(true);
+              audio.pause();
             }
           }}
         >
