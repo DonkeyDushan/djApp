@@ -6,39 +6,37 @@ import React, { useEffect, useState } from 'react';
 type Types = {
   checked: boolean;
   onClick: () => void;
-  audioObject: { text: string; src: string; audio: HTMLAudioElement };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleLoopAudio: any;
+  audioObject: { text: string; src: string; audio: Howl };
 };
 
-const AudioButton = ({ audioObject, checked, onClick, handleLoopAudio }: Types) => {
+const AudioButton = ({ audioObject, checked, onClick }: Types) => {
   const { audio, text, src } = audioObject;
   const [paused, setPaused] = useState(true);
+
   useEffect(() => {
-    const handlePlay = () => setPaused(false);
-    const handlePause = () => setPaused(true);
-    const handleEnd = () => {
-      if (!src.includes('Custom') && checked) {
-        handleLoopAudio(audio, src);
-      }
+    const customEndListener = () => {
+      setPaused(true);
     };
 
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handleEnd);
+    const handlePlay = () => {
+      setPaused(false);
+      audio.off('end', customEndListener);
+      audio.on('end', customEndListener);
+    };
+    const handlePause = () => setPaused(true);
+
+    // Nastavíme posluchače pro různé události
+    audio.on('play', handlePlay);
+    audio.on('pause', handlePause);
+    audio.on('stop', handlePause);
 
     return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handleEnd);
+      audio.off('play', handlePlay);
+      audio.off('pause', handlePause);
+      audio.off('stop', handlePause);
+      audio.off('end', customEndListener); // Odstraníme vlastní listener při unmountu
     };
-  }, [audio, checked, handleLoopAudio, src]);
-
-  useEffect(() => {
-    audio.loop = checked && audio.src.includes('Custom');
-    if (!checked) audio.pause();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked]);
+  }, [audio, src]);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
@@ -50,9 +48,11 @@ const AudioButton = ({ audioObject, checked, onClick, handleLoopAudio }: Types) 
 
         <IconButton
           onClick={() => {
-            if (paused) {
+            if (!audio.playing()) {
+              setPaused(false);
               audio.play();
             } else {
+              setPaused(true);
               audio.pause();
             }
           }}
