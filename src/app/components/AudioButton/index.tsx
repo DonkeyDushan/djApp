@@ -7,15 +7,16 @@ type Types = {
   checked: boolean;
   onClick: () => void;
   audioObject: { text: string; src: string; audio: Howl };
-  sliders: { src: string; volume: number; rate: number } | undefined;
+  rateSlider: { src: string; volume: number; rate: number } | undefined;
+  volumeSlider: { src: string; volume: number; rate: number } | undefined;
 };
 
-const AudioButton = ({ audioObject, checked, onClick, sliders }: Types) => {
+const AudioButton = ({ audioObject, checked, onClick, rateSlider, volumeSlider }: Types) => {
   const { audio, text, src } = audioObject;
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(true);
-  const [volume, setVolume] = useState(sliders?.volume || 50);
-  const [rate, setRate] = useState(sliders?.rate || 10);
+  const [volume, setVolume] = useState(volumeSlider?.volume || 50);
+  const [rate, setRate] = useState(rateSlider?.rate || 10);
 
   useEffect(() => {
     const customEndListener = () => {
@@ -53,9 +54,9 @@ const AudioButton = ({ audioObject, checked, onClick, sliders }: Types) => {
     audio.rate(rate / 10);
   }, [audio, rate]);
   useEffect(() => {
-    setVolume((sliders?.volume || 0.5) * 100);
-    setRate((sliders?.rate || 1) * 10);
-  }, [sliders]);
+    setVolume((volumeSlider?.volume || 0.5) * 100);
+    setRate((rateSlider?.rate || 1) * 10);
+  }, [rateSlider?.rate, volumeSlider]);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>

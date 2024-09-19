@@ -31,11 +31,15 @@ import {
 import InfoDialog from 'app/components/InfoDialog';
 import SaveDialog from 'app/components/SaveDialog';
 import LoadDialog from 'app/components/LoadDialog';
+import { fadeInAudio, fadeOutAudio } from '../utils';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [sliders, setSliders] = useState<{ src: string; volume: number; rate: number }[]>([]);
+  const [volumeSlider, setVolumeSlider] = useState<{ src: string; volume: number; rate: number }[]>(
+    [],
+  );
+  const [rateSlider, setRateSlider] = useState<{ src: string; rate: number; volume: number }[]>([]);
 
   const audioList = useMemo(
     () => [
@@ -92,10 +96,10 @@ export const MainPage = () => {
     } else {
       newValues = [...checkedValues, key];
       setCheckedValues(newValues);
-      const playingAudio = allCheckedAudio.find(
-        (a, i) => a.playing() && !audioList[i].src.includes('Custom'),
+      const playingAudio = audioList.find(
+        ({ audio: a, src }) => a.playing() && !src.includes('Custom'),
       );
-      const currentTime = playingAudio && !key.includes('Custom') ? playingAudio.seek() : 0;
+      const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
       audio.seek(currentTime);
       if (isPlaying) {
         audio.play();
@@ -118,24 +122,41 @@ export const MainPage = () => {
 
   const loadMixFromLocalStorage = (name: string) => {
     const savedMix = JSON.parse(localStorage.getItem(name) || '{}');
-    const playingAudio = allCheckedAudio.find(
-      (a, i) => a.playing() && !audioList[i].src.includes('Custom'),
+    const playingAudio = audioList.find(
+      ({ audio, src }) => audio.playing() && !src.includes('Custom'),
     );
-    const currentTime = playingAudio ? playingAudio.seek() : 0;
-    console.log(playingAudio);
+    const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
+    console.log(name, playingAudio, currentTime);
 
-    if (savedMix.checkedValues && savedMix.sliders) {
-      Howler.stop();
-      setIsPlaying(false);
-      setIsPlaying(true);
-      setSliders(savedMix.sliders);
-      setCheckedValues(savedMix.checkedValues || []);
-      audioList.forEach((audio) => {
-        if (savedMix.checkedValues.includes(audio.src)) {
-          audio.audio.play();
-          audio.audio.seek(currentTime);
+    Howler.stop();
+    const handleNewCheck = (newValues: string[]) => {
+      audioList?.forEach(({ audio, src }, i) => {
+        audio.seek(currentTime);
+        if (newValues.includes(src)) {
+          if (isPlaying) {
+            audio.play();
+          }
+          fadeInAudio({
+            audio: audio,
+            src,
+            minVolume: checkedValues.includes(src) ? audio.volume() : 0,
+            maxVolume: savedMix.sliders[i].volume,
+          });
+
+          /* setTimeout(() => {
+            setVolumeSlider(volumeSlider);
+          }, 6000); */
+        } else if (checkedValues.includes(src)) {
+          if (isPlaying) audio.play();
+          fadeOutAudio({ audio, src });
         }
       });
+    };
+
+    if (savedMix.checkedValues && savedMix.sliders) {
+      setCheckedValues(savedMix.checkedValues || []);
+      handleNewCheck(savedMix.checkedValues || []);
+      setRateSlider(savedMix.sliders || []);
     }
   };
 
@@ -188,7 +209,8 @@ export const MainPage = () => {
               onClick={() => {
                 setCheckedValues([]);
                 stopAll();
-                setSliders([]);
+                setVolumeSlider([]);
+                setRateSlider([]);
               }}
               className={styles.headerButton}
             >
@@ -212,7 +234,8 @@ export const MainPage = () => {
                 checked={checkedValues.includes(audioObject.src)}
                 audioObject={audioObject}
                 onClick={() => handleCheck({ key: audioObject.src, audio: audioObject.audio })}
-                sliders={sliders.find((slider) => slider.src === audioObject.src)}
+                rateSlider={rateSlider.find((slider) => slider.src === audioObject.src)}
+                volumeSlider={volumeSlider.find((slider) => slider.src === audioObject.src)}
               />
             ))}
           </Box>
