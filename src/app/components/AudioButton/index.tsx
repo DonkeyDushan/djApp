@@ -93,6 +93,7 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
         size="small"
         min={5}
         max={20}
+        step={0.25}
         value={rate}
         onChange={(e, v) => setRate(v as number)}
         disabled={loading}
