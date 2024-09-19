@@ -88,6 +88,27 @@ export const MainPage = () => {
     });
   };
 
+  const handleLoopAudio = (audio: Howl, src: string) => {
+    if (checkedValues.includes(src)) {
+      if (!src.includes('Custom')) {
+        Howler.stop();
+        playAll({ zeroTime: true });
+      } else {
+        audio.seek(0);
+        audio.play();
+      }
+    }
+  };
+
+  const setAudioTime = ({ audio, src, time }: { audio: Howl; src: string; time?: number }) => {
+    const playingAudio = audioList.find(
+      ({ audio: a, src: s }) => a.playing() && !s.includes('Custom'),
+    );
+    const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
+    console.log(src.includes('Custom') ? 0 : time || currentTime);
+    audio.seek(src.includes('Custom') ? 0 : time || currentTime);
+  };
+
   const handleCheck = ({ key, audio }: { key: string; audio: Howl }) => {
     let newValues;
     if (checkedValues.includes(key)) {
@@ -97,28 +118,12 @@ export const MainPage = () => {
     } else {
       newValues = [...checkedValues, key];
       setCheckedValues(newValues);
-      const playingAudio = audioList.find(
-        ({ audio: a, src }) => a.playing() && !src.includes('Custom'),
-      );
-      const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
-      audio.seek(currentTime);
+      setAudioTime({ audio, src: key });
       if (isPlaying) {
+        console.log('play');
         audio.play();
       }
     }
-  };
-
-  const saveMixToLocalStorage = (name: string) => {
-    const mixData = {
-      checkedValues: checkedValues,
-      sliders: allAudio.map((audio, i) => ({
-        src: audioList[i].src,
-        volume: audio.volume(),
-        rate: audio.rate(),
-      })),
-    };
-
-    localStorage.setItem(name, JSON.stringify(mixData));
   };
 
   const loadMixFromLocalStorage = (name: string) => {
@@ -132,7 +137,7 @@ export const MainPage = () => {
     Howler.stop();
     const handleNewCheck = (newValues: string[]) => {
       audioList?.forEach(({ audio, src }, i) => {
-        audio.seek(src.includes('Custom') ? 0 : currentTime);
+        setAudioTime({ audio, src, time: currentTime });
         if (newValues.includes(src)) {
           if (isPlaying) {
             audio.play();
@@ -161,16 +166,17 @@ export const MainPage = () => {
     }
   };
 
-  const handleLoopAudio = (audio: Howl, src: string) => {
-    if (checkedValues.includes(src)) {
-      if (!src.includes('Custom')) {
-        Howler.stop();
-        playAll({ zeroTime: true });
-      } else {
-        audio.seek(0);
-        audio.play();
-      }
-    }
+  const saveMixToLocalStorage = (name: string) => {
+    const mixData = {
+      checkedValues: checkedValues,
+      sliders: allAudio.map((audio, i) => ({
+        src: audioList[i].src,
+        volume: audio.volume(),
+        rate: audio.rate(),
+      })),
+    };
+
+    localStorage.setItem(name, JSON.stringify(mixData));
   };
 
   useEffect(() => {
