@@ -51,12 +51,17 @@ const InfoDialog = () => {
               'Checked recordings will play in sync when you click the large "PLAY" button. You can save these selected recordings using the "SAVE" button.'
             }
           </li>
+          <li>{'Checked recordings play in loop.'}</li>
           <li>
             {
               'Each newly checked recording will automatically sync with the current playback time of the other tracks.'
             }
           </li>
-          <li>{'Individual "PLAY" buttons will play each recording independently of the rest.'}</li>
+          <li>
+            {
+              'Individual "PLAY" buttons will play each recording independently of the rest and only once.'
+            }
+          </li>
           <li>
             {
               'Custom recordings always play from the beginning, regardless of the other tracks, even if they are checked.'
