@@ -67,6 +67,7 @@ const InfoDialog = () => {
               'Custom recordings always play from the beginning, regardless of the other tracks, even if they are checked.'
             }
           </li>
+          <li>{'First slider: volume, second slider: speed. Also saved by "SAVE" button.'}</li>
         </Box>
       </Modal>
     </>
