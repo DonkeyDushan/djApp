@@ -67,7 +67,7 @@ export const MainPage = () => {
   const playAll = ({ zeroTime }: { zeroTime?: boolean }) => {
     allCheckedAudio.forEach((audio) => {
       if (zeroTime) audio.pos(0);
-      audio?.play();
+      audio.play();
     });
 
     setIsPlaying(true);
@@ -93,7 +93,7 @@ export const MainPage = () => {
       );
       const currentTime = playingAudio && !key.includes('Custom') ? playingAudio.seek() : 0;
       console.log(currentTime);
-      audio.pos(currentTime);
+      audio.seek(currentTime);
       if (isPlaying) {
         audio.play();
       }
@@ -112,10 +112,11 @@ export const MainPage = () => {
 
   const handleLoopAudio = (audio: Howl, src: string) => {
     if (checkedValues.includes(src)) {
-      audio.pos(0);
-      audio.play();
       if (!src.includes('Custom')) {
         playAll({ zeroTime: true });
+      } else {
+        audio.pos(0);
+        audio.play();
       }
     }
   };
