@@ -18,6 +18,8 @@ const style = {
   px: 4,
   py: 2,
   color: 'black',
+  maxHeight: '95vh',
+  overflow: 'auto',
 };
 
 const LoadDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
@@ -53,7 +55,6 @@ const LoadDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        sx={{ maxHeight: '95vh', overflow: 'auto' }}
       >
         <Box sx={style}>
           <IconButton
