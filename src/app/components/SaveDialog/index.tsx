@@ -55,8 +55,10 @@ const SaveDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
           <TextField value={name} onChange={(e) => setName(e.target.value)} />
           <Button
             onClick={() => {
-              handleSave(`mixtape_${name}`);
-              handleClose();
+              if (name) {
+                handleSave(`mixtape_${name}`);
+                handleClose();
+              }
             }}
             sx={{ mt: 2, fontSize: '1.2rem', fontWeight: 600, color: 'rgba(227, 61, 148, 1)' }}
           >
