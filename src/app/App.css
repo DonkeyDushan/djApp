@@ -25,3 +25,10 @@ body {
 .MuiButtonBase-root {
   font-family: 'Courier New', monospace !important;
 }
+
+input {
+  font-family: 'Courier New', monospace !important;
+  font-size: 1.1rem !important;
+  line-height: 1 !important;
+  font-weight: 600 !important;
+}
