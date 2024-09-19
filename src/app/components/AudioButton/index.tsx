@@ -13,6 +13,8 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
   const { audio, text, src } = audioObject;
   const [paused, setPaused] = useState(true);
   const [volume, setVolume] = useState(50);
+  const [loading, setLoading] = useState(true);
+  const [rate, setRate] = useState(10);
 
   useEffect(() => {
     const customEndListener = () => {
@@ -25,28 +27,41 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
       audio.on('end', customEndListener);
     };
     const handlePause = () => setPaused(true);
+    const handleLoad = () => {
+      setLoading(false);
+    };
 
     audio.on('play', handlePlay);
     audio.on('pause', handlePause);
     audio.on('stop', handlePause);
+    audio.on('load', handleLoad);
 
     return () => {
       audio.off('play', handlePlay);
       audio.off('pause', handlePause);
       audio.off('stop', handlePause);
       audio.off('end', customEndListener);
+      audio.off('load', handleLoad);
     };
   }, [audio, src]);
 
   useEffect(() => {
     audio.volume(volume / 100);
   }, [audio, volume]);
+  useEffect(() => {
+    audio.rate(rate / 10);
+  }, [audio, rate]);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
       <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'auto auto', alignItems: 'center' }}>
-          <Checkbox checked={checked} onClick={onClick} sx={{ svg: { color: '#3267f4' } }} />
+          <Checkbox
+            checked={checked}
+            onClick={onClick}
+            sx={{ svg: { color: loading ? 'grey' : '#3267f4' } }}
+            disabled={loading}
+          />
           {text}
         </Box>
 
@@ -60,6 +75,7 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
               audio.pause();
             }
           }}
+          disabled={loading}
         >
           {paused ? <PlayArrowRounded fontSize={'large'} /> : <PauseCircle fontSize={'large'} />}
         </IconButton>
@@ -70,6 +86,16 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
         max={100}
         value={volume}
         onChange={(e, v) => setVolume(v as number)}
+        disabled={loading}
+      />
+
+      <Slider
+        size="small"
+        min={5}
+        max={20}
+        value={rate}
+        onChange={(e, v) => setRate(v as number)}
+        disabled={loading}
       />
     </Stack>
   );
