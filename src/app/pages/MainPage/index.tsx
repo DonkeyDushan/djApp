@@ -29,6 +29,8 @@ import {
   pad3,
 } from './sounds';
 import InfoDialog from 'app/components/InfoDialog';
+import SaveDialog from 'app/components/SaveDialog';
+import LoadDialog from 'app/components/LoadDialog';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
@@ -100,33 +102,33 @@ export const MainPage = () => {
       }
     }
   };
-  const saveCheckedValuesToLocalStorage = () => {
-    localStorage.setItem('checkedAudioValues', JSON.stringify(checkedValues));
-    localStorage.setItem(
-      'sliders',
-      JSON.stringify(
-        allAudio.map((audio, i) => ({
-          src: audioList[i].src,
-          volume: audio.volume(),
-          rate: audio.rate(),
-        })),
-      ),
-    );
+
+  const saveMixToLocalStorage = (name: string) => {
+    const mixData = {
+      checkedValues: checkedValues,
+      sliders: allAudio.map((audio, i) => ({
+        src: audioList[i].src,
+        volume: audio.volume(),
+        rate: audio.rate(),
+      })),
+    };
+
+    localStorage.setItem(name, JSON.stringify(mixData));
   };
 
-  const loadCheckedValuesFromLocalStorage = () => {
+  const loadMixFromLocalStorage = (name: string) => {
     stopAll();
     setIsPlaying(false);
 
-    const savedValues = JSON.parse(localStorage.getItem('checkedAudioValues') || '[]');
-    const savedSliders = JSON.parse(localStorage.getItem('sliders') || '[]');
+    const savedMix = JSON.parse(localStorage.getItem(name) || '{}');
 
-    setCheckedValues(savedValues || []);
-
-    if (Array.isArray(savedSliders) && savedSliders.length > 0) {
-      setSliders(savedSliders);
+    if (savedMix.checkedValues && savedMix.sliders) {
+      setCheckedValues(savedMix.checkedValues || []);
+      setSliders(savedMix.sliders);
     } else {
-      setSliders([]); // Set default value if something is wrong
+      console.error('Invalid mix data loaded');
+      setCheckedValues([]);
+      setSliders([]);
     }
   };
 
@@ -173,12 +175,8 @@ export const MainPage = () => {
           </Stack>
 
           <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
-            <Button onClick={saveCheckedValuesToLocalStorage} className={styles.headerButton}>
-              Save
-            </Button>
-            <Button onClick={loadCheckedValuesFromLocalStorage} className={styles.headerButton}>
-              Load saved mix
-            </Button>
+            <SaveDialog handleSave={saveMixToLocalStorage} />
+            <LoadDialog handleSave={loadMixFromLocalStorage} />
             <Button
               onClick={() => {
                 setCheckedValues([]);
