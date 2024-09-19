@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
-import { Box, Checkbox, IconButton, Stack } from '@mui/material';
+import { Box, Checkbox, IconButton, Slider, Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 type Types = {
@@ -12,6 +12,7 @@ type Types = {
 const AudioButton = ({ audioObject, checked, onClick }: Types) => {
   const { audio, text, src } = audioObject;
   const [paused, setPaused] = useState(true);
+  const [volume, setVolume] = useState(100);
 
   useEffect(() => {
     const customEndListener = () => {
@@ -37,6 +38,10 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
     };
   }, [audio, src]);
 
+  useEffect(() => {
+    audio.volume(volume / 100);
+  }, [audio, volume]);
+
   return (
     <Stack justifyContent={'center'} color={'#000'}>
       <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
@@ -59,6 +64,13 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
           {paused ? <PlayArrowRounded fontSize={'large'} /> : <PauseCircle fontSize={'large'} />}
         </IconButton>
       </Stack>
+      <Slider
+        size="small"
+        min={0}
+        max={100}
+        value={volume}
+        onChange={(e, v) => setVolume(v as number)}
+      />
     </Stack>
   );
 };
