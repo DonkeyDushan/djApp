@@ -30,7 +30,7 @@ const LoadDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
     // Fetch all keys from localStorage
     const keys = Object.keys(localStorage);
     // Filter only those that contain mix data (you can use a naming convention if needed)
-    return keys.filter((key) => key.includes('mixtape_')); // Adjust if you have other keys
+    return keys.filter((key) => key.includes('mixtape_')).sort((a, b) => a.localeCompare(b)); // Adjust if you have other keys
   };
   React.useEffect(() => {
     // Get saved mixes when component mounts

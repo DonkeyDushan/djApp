@@ -28,6 +28,12 @@ const SaveDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
     setOpen(false);
     setName('');
   };
+  const handleSend = () => {
+    if (name) {
+      handleSave(`mixtape_${name}`);
+      handleClose();
+    }
+  };
 
   return (
     <>
@@ -52,14 +58,17 @@ const SaveDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
           >
             <CloseOutlined />
           </IconButton>
-          <TextField value={name} onChange={(e) => setName(e.target.value)} />
-          <Button
-            onClick={() => {
-              if (name) {
-                handleSave(`mixtape_${name}`);
-                handleClose();
+          <TextField
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && name) {
+                handleSend();
               }
             }}
+          />
+          <Button
+            onClick={handleSend}
             sx={{ mt: 2, fontSize: '1.2rem', fontWeight: 600, color: 'rgba(227, 61, 148, 1)' }}
           >
             SAVE

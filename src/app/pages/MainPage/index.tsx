@@ -40,6 +40,7 @@ export const MainPage = () => {
     [],
   );
   const [rateSlider, setRateSlider] = useState<{ src: string; rate: number; volume: number }[]>([]);
+  const [currentMix, setCurrentMix] = useState('');
 
   const audioList = useMemo(
     () => [
@@ -126,12 +127,12 @@ export const MainPage = () => {
       ({ audio, src }) => audio.playing() && !src.includes('Custom'),
     );
     const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
-    console.log(name, playingAudio, currentTime);
+    setCurrentMix(name);
 
     Howler.stop();
     const handleNewCheck = (newValues: string[]) => {
       audioList?.forEach(({ audio, src }, i) => {
-        audio.seek(currentTime);
+        audio.seek(src.includes('Custom') ? 0 : currentTime);
         if (newValues.includes(src)) {
           if (isPlaying) {
             audio.play();
@@ -143,9 +144,9 @@ export const MainPage = () => {
             maxVolume: savedMix.sliders[i].volume,
           });
 
-          /* setTimeout(() => {
+          setTimeout(() => {
             setVolumeSlider(volumeSlider);
-          }, 6000); */
+          }, 6000);
         } else if (checkedValues.includes(src)) {
           if (isPlaying) audio.play();
           fadeOutAudio({ audio, src });
@@ -201,29 +202,31 @@ export const MainPage = () => {
             <h2>{'Audio mixing tool'}</h2>
             <InfoDialog />
           </Stack>
-
-          <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
-            <SaveDialog handleSave={saveMixToLocalStorage} />
-            <LoadDialog handleSave={loadMixFromLocalStorage} />
-            <Button
-              onClick={() => {
-                setCheckedValues([]);
-                stopAll();
-                setVolumeSlider([]);
-                setRateSlider([]);
-              }}
-              className={styles.headerButton}
-            >
-              Clear all
-            </Button>
-            <Button
-              onClick={() => {
-                location.reload();
-              }}
-              className={styles.headerButton}
-            >
-              Restart
-            </Button>
+          <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
+            <h3>{currentMix.split('mixtape_')[1]}</h3>
+            <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
+              <SaveDialog handleSave={saveMixToLocalStorage} />
+              <LoadDialog handleSave={loadMixFromLocalStorage} />
+              <Button
+                onClick={() => {
+                  setCheckedValues([]);
+                  stopAll();
+                  setVolumeSlider([]);
+                  setRateSlider([]);
+                }}
+                className={styles.headerButton}
+              >
+                Clear all
+              </Button>
+              <Button
+                onClick={() => {
+                  location.reload();
+                }}
+                className={styles.headerButton}
+              >
+                Restart
+              </Button>
+            </Stack>
           </Stack>
         </Box>
         <Box className={styles.content}>
