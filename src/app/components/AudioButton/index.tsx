@@ -12,7 +12,7 @@ type Types = {
 const AudioButton = ({ audioObject, checked, onClick }: Types) => {
   const { audio, text, src } = audioObject;
   const [paused, setPaused] = useState(true);
-  const [volume, setVolume] = useState(100);
+  const [volume, setVolume] = useState(50);
 
   useEffect(() => {
     const customEndListener = () => {
