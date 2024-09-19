@@ -15,23 +15,40 @@ const AudioButton = ({ audioObject, checked, onClick, handleLoopAudio }: Types) 
   const { audio, text, src } = audioObject;
   const [paused, setPaused] = useState(true);
 
-  const handleEnd = () => {
-    console.log(checked, src, 'ended');
-    setPaused(true);
-    if (!src.includes('Custom')) handleLoopAudio(audio, src);
-  };
+  useEffect(() => {
+    const handleEnd = () => {
+      if (!src.includes('Custom') && checked) {
+        handleLoopAudio(audio, src);
+      } else {
+        setPaused(true);
+      }
+    };
+
+    audio.addEventListener('ended', handleEnd);
+    audio.addEventListener('paused', () => {
+      setPaused(true);
+    });
+    audio.addEventListener('play', () => {
+      setPaused(false);
+    });
+    return () => {
+      audio.removeEventListener('ended', handleEnd);
+      audio.removeEventListener('paused', handleEnd);
+      audio.removeEventListener('play', handleEnd);
+    };
+  }, [audio, checked, handleLoopAudio, src]);
 
   useEffect(() => {
     audio.loop = checked && audio.src.includes('Custom');
+    if (!checked) setPaused(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked]);
 
   useEffect(() => {
-    if (!paused && checked && audio.src.includes('Custom')) {
-      audio.removeEventListener('ended', () => handleEnd());
-    }
+    if (paused) audio.pause();
+    if (!paused) audio.play();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused, checked]);
+  }, [paused]);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
@@ -43,20 +60,14 @@ const AudioButton = ({ audioObject, checked, onClick, handleLoopAudio }: Types) 
 
         <IconButton
           onClick={() => {
-            if (!audio.paused || !paused) {
-              audio.pause();
-              setPaused(true);
-            } else {
-              audio.play();
+            if (paused) {
               setPaused(false);
+            } else {
+              setPaused(true);
             }
           }}
         >
-          {paused || audio.paused ? (
-            <PlayArrowRounded fontSize={'large'} />
-          ) : (
-            <PauseCircle fontSize={'large'} />
-          )}
+          {paused ? <PlayArrowRounded fontSize={'large'} /> : <PauseCircle fontSize={'large'} />}
         </IconButton>
       </Stack>
     </Stack>
