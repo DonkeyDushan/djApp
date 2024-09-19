@@ -26,7 +26,7 @@ export const fadeOutAudio = ({
 export const fadeInAudio = ({
   audio,
   src,
-  maxVolume,
+  maxVolume = 0.5,
   minVolume = 0,
 }: {
   audio: Howl;

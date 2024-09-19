@@ -36,11 +36,8 @@ import { fadeInAudio, fadeOutAudio } from '../utils';
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [volumeSlider, setVolumeSlider] = useState<{ src: string; volume: number; rate: number }[]>(
-    [],
-  );
-  const [rateSlider, setRateSlider] = useState<{ src: string; rate: number; volume: number }[]>([]);
-  const [currentMix, setCurrentMix] = useState('');
+  const [sliders, setSliders] = useState<{ src: string; rate: number; volume: number }[]>([]);
+  const [currentMix, setCurrentMix] = useState<string>('');
 
   const audioList = useMemo(
     () => [
@@ -67,6 +64,8 @@ export const MainPage = () => {
     ],
     [],
   );
+
+  const defaultSliders = audioList.map(({ src }) => ({ src: src, volume: 0.5, rate: 1 }));
 
   const allAudio = audioList.map((item) => item.audio);
   const allCheckedAudio = audioList
@@ -148,10 +147,6 @@ export const MainPage = () => {
             minVolume: checkedValues.includes(src) ? audio.volume() : 0,
             maxVolume: savedMix.sliders[i].volume,
           });
-
-          setTimeout(() => {
-            setVolumeSlider(volumeSlider);
-          }, 6000);
         } else if (checkedValues.includes(src)) {
           if (isPlaying) audio.play();
           fadeOutAudio({ audio, src });
@@ -162,7 +157,7 @@ export const MainPage = () => {
     if (savedMix.checkedValues && savedMix.sliders) {
       setCheckedValues(savedMix.checkedValues || []);
       handleNewCheck(savedMix.checkedValues || []);
-      setRateSlider(savedMix.sliders || []);
+      setSliders(savedMix.sliders || []);
     }
   };
 
@@ -217,8 +212,7 @@ export const MainPage = () => {
                 onClick={() => {
                   setCheckedValues([]);
                   stopAll();
-                  setVolumeSlider([]);
-                  setRateSlider([]);
+                  setSliders(defaultSliders);
                 }}
                 className={styles.headerButton}
               >
@@ -243,8 +237,7 @@ export const MainPage = () => {
                 checked={checkedValues.includes(audioObject.src)}
                 audioObject={audioObject}
                 onClick={() => handleCheck({ key: audioObject.src, audio: audioObject.audio })}
-                rateSlider={rateSlider.find((slider) => slider.src === audioObject.src)}
-                volumeSlider={volumeSlider.find((slider) => slider.src === audioObject.src)}
+                slider={sliders.find((slider) => slider.src === audioObject.src)}
               />
             ))}
           </Box>

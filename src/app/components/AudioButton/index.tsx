@@ -7,16 +7,15 @@ type Types = {
   checked: boolean;
   onClick: () => void;
   audioObject: { text: string; src: string; audio: Howl };
-  rateSlider: { src: string; volume: number; rate: number } | undefined;
-  volumeSlider: { src: string; volume: number; rate: number } | undefined;
+  slider: { src: string; volume: number; rate: number } | undefined;
 };
 
-const AudioButton = ({ audioObject, checked, onClick, rateSlider, volumeSlider }: Types) => {
+const AudioButton = ({ audioObject, checked, onClick, slider }: Types) => {
   const { audio, text, src } = audioObject;
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(true);
-  const [volume, setVolume] = useState(volumeSlider?.volume || 50);
-  const [rate, setRate] = useState(rateSlider?.rate || 10);
+  const [volume, setVolume] = useState(slider?.volume || 50);
+  const [rate, setRate] = useState(slider?.rate || 10);
 
   useEffect(() => {
     const customEndListener = () => {
@@ -32,20 +31,23 @@ const AudioButton = ({ audioObject, checked, onClick, rateSlider, volumeSlider }
     const handleLoad = () => {
       setLoading(false);
     };
+    const handleStop = () => {
+      setPaused(true);
+    };
 
     audio.on('play', handlePlay);
     audio.on('pause', handlePause);
-    audio.on('stop', handlePause);
+    audio.on('stop', handleStop);
     audio.on('load', handleLoad);
 
     return () => {
       audio.off('play', handlePlay);
       audio.off('pause', handlePause);
-      audio.off('stop', handlePause);
+      audio.off('stop', handleStop);
       audio.off('end', customEndListener);
       audio.off('load', handleLoad);
     };
-  }, [audio, src]);
+  }, [audio, slider?.rate, slider?.volume, src]);
 
   useEffect(() => {
     audio.volume(volume / 100);
@@ -54,9 +56,11 @@ const AudioButton = ({ audioObject, checked, onClick, rateSlider, volumeSlider }
     audio.rate(rate / 10);
   }, [audio, rate]);
   useEffect(() => {
-    setVolume((volumeSlider?.volume || 0.5) * 100);
-    setRate((rateSlider?.rate || 1) * 10);
-  }, [rateSlider?.rate, volumeSlider]);
+    setTimeout(() => {
+      setVolume((slider?.volume || 0.5) * 100);
+    }, 6000);
+    setRate((slider?.rate || 1) * 10);
+  }, [slider]);
 
   return (
     <Stack justifyContent={'center'} color={'#000'}>
