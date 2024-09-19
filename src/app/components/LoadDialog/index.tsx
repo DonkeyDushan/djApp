@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { CloseOutlined } from '@mui/icons-material';
-import { Button, IconButton } from '@mui/material';
+import { CloseOutlined, DeleteOutline } from '@mui/icons-material';
+import { Button, IconButton, Stack } from '@mui/material';
 import styles from 'app/pages/MainPage/index.module.css';
 
 const style = {
@@ -38,6 +38,11 @@ const LoadDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
     setSavedMixes(mixes);
   }, [open]);
 
+  const deleteMix = (mixName: string) => {
+    localStorage.removeItem(mixName);
+    setSavedMixes((prev) => prev.filter((mix) => mix !== mixName));
+  };
+
   return (
     <>
       <Button onClick={handleOpen} className={styles.headerButton}>
@@ -62,16 +67,20 @@ const LoadDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
             <CloseOutlined />
           </IconButton>
           {savedMixes.map((item) => (
-            <Button
-              key={item}
-              onClick={() => {
-                handleSave(item);
-                handleClose();
-              }}
-              sx={{ fontSize: '1.2rem', mb: 1 }}
-            >
-              {item.split('mixtape_')[1]}
-            </Button>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto' }} key={item} gap={1}>
+              <Button
+                onClick={() => {
+                  handleSave(item);
+                  handleClose();
+                }}
+                sx={{ fontSize: '1.2rem', mb: 1, justifyContent: 'start' }}
+              >
+                {item.split('mixtape_')[1]}
+              </Button>
+              <IconButton onClick={() => deleteMix(item)} sx={{ height: 'fit-content' }}>
+                <DeleteOutline />
+              </IconButton>
+            </Box>
           ))}
         </Box>
       </Modal>
