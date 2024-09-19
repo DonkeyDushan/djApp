@@ -39,8 +39,9 @@ export const MainPage = () => {
 
   const audioList = useMemo(
     () => [
-      { text: 'Funk Bass 1', src: 'Funk_Bass1.wav', audio: bass1 },
-      { text: 'Funk Bass 2', src: 'Funk_Bass2.wav', audio: bass2 },
+      { text: 'Custom Sound 1', src: 'Custom1.mp3', audio: custom1 },
+      { text: 'Custom Sound 2', src: 'Custom2.mp3', audio: custom2 },
+      { text: 'Custom Sound 3', src: 'Custom3.mp3', audio: custom3 },
       { text: 'Funk Drums 1', src: 'Funk_Drumz1.wav', audio: drums1 },
       { text: 'Funk Drums 2', src: 'Funk_Drumz2.wav', audio: drums2 },
       { text: 'Funk Drums 3', src: 'Funk_Drumz3.wav', audio: drums3 },
@@ -56,9 +57,8 @@ export const MainPage = () => {
       { text: 'Anodic Pad 1', src: 'Anodic_Pad1.wav', audio: pad1 },
       { text: 'Anodic Pad 2', src: 'Anodic_Pad2.wav', audio: pad2 },
       { text: 'Anodic Pad 3', src: 'Anodic_Pad3.wav', audio: pad3 },
-      { text: 'Custom Sound 1', src: 'Custom1.mp3', audio: custom1 },
-      { text: 'Custom Sound 2', src: 'Custom2.mp3', audio: custom2 },
-      { text: 'Custom Sound 3', src: 'Custom3.mp3', audio: custom3 },
+      { text: 'Funk Bass 1', src: 'Funk_Bass1.wav', audio: bass1 },
+      { text: 'Funk Bass 2', src: 'Funk_Bass2.wav', audio: bass2 },
     ],
     [],
   );
@@ -118,30 +118,24 @@ export const MainPage = () => {
 
   const loadMixFromLocalStorage = (name: string) => {
     const savedMix = JSON.parse(localStorage.getItem(name) || '{}');
-    const handleNewCheck = (newValues: string[]) => {
-      setCheckedValues(newValues);
-      const playingAudio = allCheckedAudio.find(
-        (a, i) => a.playing() && !audioList[i].src.includes('Custom'),
-      );
-      const currentTime = playingAudio ? playingAudio.seek() : 0;
-      audioList.forEach((audio) => {
-        if (newValues.includes(audio.src)) {
-          audio.audio.seek(currentTime);
-          audio.audio.play();
-        } else {
-          audio.audio.stop();
-        }
-      });
-    };
+    const playingAudio = allCheckedAudio.find(
+      (a, i) => a.playing() && !audioList[i].src.includes('Custom'),
+    );
+    const currentTime = playingAudio ? playingAudio.seek() : 0;
+    console.log(playingAudio);
 
     if (savedMix.checkedValues && savedMix.sliders) {
       Howler.stop();
-      setCheckedValues(savedMix.checkedValues || []);
+      setIsPlaying(false);
+      setIsPlaying(true);
       setSliders(savedMix.sliders);
-      handleNewCheck(savedMix.checkedValues || []);
-    } else {
-      setCheckedValues([]);
-      setSliders([]);
+      setCheckedValues(savedMix.checkedValues || []);
+      audioList.forEach((audio) => {
+        if (savedMix.checkedValues.includes(audio.src)) {
+          audio.audio.play();
+          audio.audio.seek(currentTime);
+        }
+      });
     }
   };
 
