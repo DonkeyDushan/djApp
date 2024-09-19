@@ -1,19 +1,21 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { InfoOutlined } from '@mui/icons-material';
+import { CloseOutlined, InfoOutlined } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 
 const style = {
   position: 'absolute' as const,
   top: '50%',
   left: '50%',
+  display: 'grid',
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'background.paper',
   border: '2px ridge #7d7d7d',
   boxShadow: 24,
-  p: 4,
+  px: 4,
+  py: 2,
   color: 'black',
 };
 
@@ -33,6 +35,17 @@ const InfoDialog = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
+          <IconButton
+            sx={{
+              color: 'grey',
+              fill: 'grey',
+              justifySelf: 'end',
+              marginBottom: 2,
+            }}
+            onClick={handleClose}
+          >
+            <CloseOutlined />
+          </IconButton>
           <li>
             {
               'Checked recordings will play in sync when you click the large "PLAY" button. You can save these selected recordings using the "SAVE" button.'
