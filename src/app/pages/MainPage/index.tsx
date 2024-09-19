@@ -104,7 +104,6 @@ export const MainPage = () => {
       ({ audio: a, src: s }) => a.playing() && !s.includes('Custom'),
     );
     const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
-    console.log(src.includes('Custom') ? 0 : time || currentTime);
     audio.seek(src.includes('Custom') ? 0 : time || currentTime);
   };
 
@@ -119,7 +118,6 @@ export const MainPage = () => {
       setCheckedValues(newValues);
       setAudioTime({ audio, src: key });
       if (isPlaying) {
-        console.log('play');
         audio.play();
       }
     }
