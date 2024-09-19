@@ -117,16 +117,29 @@ export const MainPage = () => {
   };
 
   const loadMixFromLocalStorage = (name: string) => {
-    stopAll();
-    setIsPlaying(false);
-
     const savedMix = JSON.parse(localStorage.getItem(name) || '{}');
+    const handleNewCheck = (newValues: string[]) => {
+      setCheckedValues(newValues);
+      const playingAudio = allCheckedAudio.find(
+        (a, i) => a.playing() && !audioList[i].src.includes('Custom'),
+      );
+      const currentTime = playingAudio ? playingAudio.seek() : 0;
+      audioList.forEach((audio) => {
+        if (newValues.includes(audio.src)) {
+          audio.audio.seek(currentTime);
+          audio.audio.play();
+        } else {
+          audio.audio.stop();
+        }
+      });
+    };
 
     if (savedMix.checkedValues && savedMix.sliders) {
+      Howler.stop();
       setCheckedValues(savedMix.checkedValues || []);
       setSliders(savedMix.sliders);
+      handleNewCheck(savedMix.checkedValues || []);
     } else {
-      console.error('Invalid mix data loaded');
       setCheckedValues([]);
       setSliders([]);
     }
