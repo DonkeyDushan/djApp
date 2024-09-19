@@ -66,7 +66,7 @@ export const MainPage = () => {
 
   const playAll = ({ zeroTime }: { zeroTime?: boolean }) => {
     allCheckedAudio.forEach((audio) => {
-      if (zeroTime) audio.pos(0);
+      if (zeroTime) audio.seek(0);
       audio.play();
     });
 
@@ -75,7 +75,7 @@ export const MainPage = () => {
   const stopAll = () => {
     Howler.stop();
     allAudio.forEach((audio) => {
-      audio.pos(0);
+      audio.seek(0);
     });
   };
 
@@ -113,9 +113,10 @@ export const MainPage = () => {
   const handleLoopAudio = (audio: Howl, src: string) => {
     if (checkedValues.includes(src)) {
       if (!src.includes('Custom')) {
+        /* stopAll(); */
         playAll({ zeroTime: true });
       } else {
-        audio.pos(0);
+        audio.seek(0);
         audio.play();
       }
     }

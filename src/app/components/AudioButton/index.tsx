@@ -25,7 +25,6 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
     };
     const handlePause = () => setPaused(true);
 
-    // Nastavíme posluchače pro různé události
     audio.on('play', handlePlay);
     audio.on('pause', handlePause);
     audio.on('stop', handlePause);
@@ -34,7 +33,7 @@ const AudioButton = ({ audioObject, checked, onClick }: Types) => {
       audio.off('play', handlePlay);
       audio.off('pause', handlePause);
       audio.off('stop', handlePause);
-      audio.off('end', customEndListener); // Odstraníme vlastní listener při unmountu
+      audio.off('end', customEndListener);
     };
   }, [audio, src]);
 
