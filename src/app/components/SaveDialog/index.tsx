@@ -58,7 +58,7 @@ const SaveDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
               handleSave(`mixtape_${name}`);
               handleClose();
             }}
-            sx={{ mt: 2, fontSize: '1.2rem', fontWeight: 600 }}
+            sx={{ mt: 2, fontSize: '1.2rem', fontWeight: 600, color: 'rgba(227, 61, 148, 1)' }}
           >
             SAVE
           </Button>

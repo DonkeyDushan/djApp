@@ -73,7 +73,14 @@ const LoadDialog = ({ handleSave }: { handleSave: (name: string) => void }) => {
                   handleSave(item);
                   handleClose();
                 }}
-                sx={{ fontSize: '1.2rem', mb: 1, justifyContent: 'start', fontWeight: 600 }}
+                sx={{
+                  fontSize: '1.2rem',
+                  mb: 1,
+                  justifyContent: 'start',
+                  fontWeight: 600,
+                  color: 'rgba(227, 61, 148, 1)',
+                  lineHeight: 1,
+                }}
               >
                 {item.split('mixtape_')[1]}
               </Button>
