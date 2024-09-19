@@ -17,8 +17,6 @@ const AudioButton = ({ audioObject, checked, onClick, sliders }: Types) => {
   const [volume, setVolume] = useState(sliders?.volume || 50);
   const [rate, setRate] = useState(sliders?.rate || 10);
 
-  console.log(sliders);
-
   useEffect(() => {
     const customEndListener = () => {
       setPaused(true);

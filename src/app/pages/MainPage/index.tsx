@@ -94,7 +94,6 @@ export const MainPage = () => {
         (a, i) => a.playing() && !audioList[i].src.includes('Custom'),
       );
       const currentTime = playingAudio && !key.includes('Custom') ? playingAudio.seek() : 0;
-      console.log(currentTime);
       audio.seek(currentTime);
       if (isPlaying) {
         audio.play();
@@ -127,7 +126,6 @@ export const MainPage = () => {
     if (Array.isArray(savedSliders) && savedSliders.length > 0) {
       setSliders(savedSliders);
     } else {
-      console.error('Invalid sliders data loaded');
       setSliders([]); // Set default value if something is wrong
     }
   };
@@ -135,7 +133,6 @@ export const MainPage = () => {
   const handleLoopAudio = (audio: Howl, src: string) => {
     if (checkedValues.includes(src)) {
       if (!src.includes('Custom')) {
-        console.log('looping our audio', src);
         Howler.stop();
         playAll({ zeroTime: true });
       } else {
