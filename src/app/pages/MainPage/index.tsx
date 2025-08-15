@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, IconButton, Stack } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, IconButton, Slider, Stack } from '@mui/material';
 import styles from './index.module.css';
 import AudioButton from 'app/components/AudioButton';
 import { PauseCircle, PlayArrowRounded } from '@mui/icons-material';
@@ -32,38 +32,38 @@ import InfoDialog from 'app/components/InfoDialog';
 import SaveDialog from 'app/components/SaveDialog';
 import LoadDialog from 'app/components/LoadDialog';
 import { fadeInAudio, fadeOutAudio } from '../utils';
+import CustomSoundsDialog from 'app/components/CustomSoundsDialog';
 
 export const MainPage = () => {
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [sliders, setSliders] = useState<{ src: string; rate: number; volume: number }[]>([]);
   const [currentMix, setCurrentMix] = useState<string>('');
+  const [globalRate, setGlobalRate] = useState(1); // default tempo
+  const [rateOverrides, setRateOverrides] = useState<{ [src: string]: number | null }>({});
 
-  const audioList = useMemo(
-    () => [
-      { text: 'Custom Sound 1', src: 'Custom1.mp3', audio: custom1 },
-      { text: 'Custom Sound 2', src: 'Custom2.mp3', audio: custom2 },
-      { text: 'Custom Sound 3', src: 'Custom3.mp3', audio: custom3 },
-      { text: 'Funk Drums 1', src: 'Funk_Drumz1.mp3', audio: drums1 },
-      { text: 'Funk Drums 2', src: 'Funk_Drumz2.mp3', audio: drums2 },
-      { text: 'Funk Drums 3', src: 'Funk_Drumz3.mp3', audio: drums3 },
-      { text: 'Anodic Drums 1', src: 'Anodic_Drums1.mp3', audio: anodicDrums1 },
-      { text: 'Anodic Drums 2', src: 'Anodic_Drums2.mp3', audio: anodicDrums2 },
-      { text: 'Anodic Drums 3', src: 'Anodic_Drums3.mp3', audio: anodicDrums3 },
-      { text: 'Funk Keys 1', src: 'Funk_Keys1.mp3', audio: keys1 },
-      { text: 'Funk Keys 2', src: 'Funk_Keys2.mp3', audio: keys2 },
-      { text: 'Funk Keys 3', src: 'Funk_Keys3.mp3', audio: keys3 },
-      { text: 'Anodic Arp 1', src: 'Anodic_Arp1.mp3', audio: arp1 },
-      { text: 'Anodic Arp 2', src: 'Anodic_Arp2.mp3', audio: arp2 },
-      { text: 'Anodic Arp 3', src: 'Anodic_Arp3.mp3', audio: arp3 },
-      { text: 'Anodic Pad 1', src: 'Anodic_Pad1.mp3', audio: pad1 },
-      { text: 'Anodic Pad 2', src: 'Anodic_Pad2.mp3', audio: pad2 },
-      { text: 'Anodic Pad 3', src: 'Anodic_Pad3.mp3', audio: pad3 },
-      { text: 'Funk Bass 1', src: 'Funk_Bass1.mp3', audio: bass1 },
-      { text: 'Funk Bass 2', src: 'Funk_Bass2.mp3', audio: bass2 },
-    ],
-    [],
-  );
+  const [audioList, setAudioList] = useState(() => [
+    { text: 'Custom Sound 1', src: 'Custom1.mp3', audio: custom1 },
+    { text: 'Custom Sound 2', src: 'Custom2.mp3', audio: custom2 },
+    { text: 'Custom Sound 3', src: 'Custom3.mp3', audio: custom3 },
+    { text: 'Funk Drums 1', src: 'Funk_Drumz1.mp3', audio: drums1 },
+    { text: 'Funk Drums 2', src: 'Funk_Drumz2.mp3', audio: drums2 },
+    { text: 'Funk Drums 3', src: 'Funk_Drumz3.mp3', audio: drums3 },
+    { text: 'Anodic Drums 1', src: 'Anodic_Drums1.mp3', audio: anodicDrums1 },
+    { text: 'Anodic Drums 2', src: 'Anodic_Drums2.mp3', audio: anodicDrums2 },
+    { text: 'Anodic Drums 3', src: 'Anodic_Drums3.mp3', audio: anodicDrums3 },
+    { text: 'Funk Keys 1', src: 'Funk_Keys1.mp3', audio: keys1 },
+    { text: 'Funk Keys 2', src: 'Funk_Keys2.mp3', audio: keys2 },
+    { text: 'Funk Keys 3', src: 'Funk_Keys3.mp3', audio: keys3 },
+    { text: 'Anodic Arp 1', src: 'Anodic_Arp1.mp3', audio: arp1 },
+    { text: 'Anodic Arp 2', src: 'Anodic_Arp2.mp3', audio: arp2 },
+    { text: 'Anodic Arp 3', src: 'Anodic_Arp3.mp3', audio: arp3 },
+    { text: 'Anodic Pad 1', src: 'Anodic_Pad1.mp3', audio: pad1 },
+    { text: 'Anodic Pad 2', src: 'Anodic_Pad2.mp3', audio: pad2 },
+    { text: 'Anodic Pad 3', src: 'Anodic_Pad3.mp3', audio: pad3 },
+    { text: 'Funk Bass 1', src: 'Funk_Bass1.mp3', audio: bass1 },
+    { text: 'Funk Bass 2', src: 'Funk_Bass2.mp3', audio: bass2 },
+  ]);
 
   const defaultSliders = audioList.map(({ src }) => ({ src: src, volume: 0.5, rate: 1 }));
 
@@ -123,6 +123,30 @@ export const MainPage = () => {
     }
   };
 
+  const handleRateChange = (src: string, newRate: number) => {
+    setRateOverrides((prev) => {
+      if (newRate === globalRate) {
+        return { ...prev, [src]: null };
+      } else {
+        return { ...prev, [src]: newRate };
+      }
+    });
+
+    const audioObj = audioList.find((a) => a.src === src);
+    if (audioObj) {
+      audioObj.audio.rate(newRate);
+    }
+  };
+
+  const handleGlobalRateChange = (newRate: number) => {
+    setGlobalRate(newRate);
+    audioList.forEach(({ src, audio }) => {
+      if (rateOverrides[src] == null) {
+        audio.rate(newRate);
+      }
+    });
+  };
+
   const loadMixFromLocalStorage = (name: string) => {
     const savedMix = JSON.parse(localStorage.getItem(name) || '{}');
     const playingAudio = audioList.find(
@@ -130,6 +154,8 @@ export const MainPage = () => {
     );
     const currentTime = playingAudio ? playingAudio.audio.seek() : 0;
     setCurrentMix(name);
+    setGlobalRate(savedMix.globalRate);
+    setRateOverrides(savedMix.rateOverrides);
 
     Howler.stop();
     const handleNewCheck = (newValues: string[]) => {
@@ -167,11 +193,30 @@ export const MainPage = () => {
         volume: audio.volume(),
         rate: audio.rate(),
       })),
+      globalRate: globalRate,
+      rateOverrides: rateOverrides,
     };
 
     localStorage.setItem(name, JSON.stringify(mixData));
   };
 
+  const handleAddCustomSound = (name: string, dataUrl: string) => {
+    const howl = new Howl({ src: [dataUrl], loop: false });
+    setAudioList((prev) => [...prev, { text: name, src: `Custom_${name}`, audio: howl }]);
+  };
+
+  useEffect(() => {
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith('customSound_'))
+      .forEach((key) => {
+        const dataUrl = localStorage.getItem(key);
+        if (dataUrl) {
+          const name = key.replace('customSound_', '');
+          const howl = new Howl({ src: [dataUrl], loop: false });
+          setAudioList((prev) => [...prev, { text: name, src: `Custom_${name}`, audio: howl }]);
+        }
+      });
+  }, []);
   useEffect(() => {
     audioList.forEach(({ audio, src }) => {
       if (checkedValues.includes(src)) {
@@ -206,6 +251,7 @@ export const MainPage = () => {
             <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
               <SaveDialog handleSave={saveMixToLocalStorage} />
               <LoadDialog handleSave={loadMixFromLocalStorage} />
+              <CustomSoundsDialog onAddCustomSound={handleAddCustomSound} />
               <Button
                 onClick={() => {
                   setCheckedValues([]);
@@ -235,10 +281,27 @@ export const MainPage = () => {
                 checked={checkedValues.includes(audioObject.src)}
                 audioObject={audioObject}
                 onClick={() => handleCheck({ key: audioObject.src, audio: audioObject.audio })}
-                slider={sliders.find((slider) => slider.src === audioObject.src)}
+                slider={{
+                  src: audioObject.src,
+                  volume: sliders.find((slider) => slider.src === audioObject.src)?.volume ?? 0.5,
+                  rate: rateOverrides[audioObject.src] ?? globalRate,
+                }}
+                onRateChange={(newRate) => handleRateChange(audioObject.src, newRate)}
               />
             ))}
           </Box>
+          <Stack alignItems="center" sx={{ padding: '20px' }}>
+            <Slider
+              size="medium"
+              min={0.5}
+              max={4}
+              step={0.025}
+              value={globalRate}
+              onChange={(e, v) => handleGlobalRateChange(v as number)}
+              valueLabelDisplay="auto"
+            />
+            <Box>Global tempo: {globalRate.toFixed(2)}x</Box>
+          </Stack>
           <Stack direction={'row'} justifyContent={'center'} sx={{ padding: '12px' }}>
             <IconButton
               onClick={() => {

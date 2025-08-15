@@ -8,14 +8,15 @@ type Types = {
   onClick: () => void;
   audioObject: { text: string; src: string; audio: Howl };
   slider: { src: string; volume: number; rate: number } | undefined;
+  onRateChange: (newRate: number) => void;
 };
 
-const AudioButton = ({ audioObject, checked, onClick, slider }: Types) => {
+const AudioButton = ({ audioObject, checked, onClick, slider, onRateChange }: Types) => {
   const { audio, text, src } = audioObject;
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(true);
   const [volume, setVolume] = useState(slider?.volume || 50);
-  const [rate, setRate] = useState(slider?.rate || 10);
+  const [rate, setRate] = useState(slider?.rate || 1);
 
   useEffect(() => {
     const customEndListener = () => {
@@ -53,13 +54,13 @@ const AudioButton = ({ audioObject, checked, onClick, slider }: Types) => {
     audio.volume(volume / 100);
   }, [audio, volume]);
   useEffect(() => {
-    audio.rate(rate / 10);
+    audio.rate(rate);
   }, [audio, rate]);
   useEffect(() => {
     setTimeout(() => {
       setVolume((slider?.volume || 0.5) * 100);
     }, 6000);
-    setRate((slider?.rate || 1) * 10);
+    setRate(slider?.rate || 1);
   }, [slider]);
 
   return (
@@ -97,16 +98,22 @@ const AudioButton = ({ audioObject, checked, onClick, slider }: Types) => {
         value={volume}
         onChange={(e, v) => setVolume(v as number)}
         disabled={loading}
+        valueLabelDisplay="auto"
       />
 
       <Slider
         size="small"
-        min={1}
-        max={40}
-        step={0.25}
+        min={0.5}
+        max={4}
+        step={0.025}
         value={rate}
-        onChange={(e, v) => setRate(v as number)}
+        onChange={(e, v) => {
+          const rateVal = v as number;
+          setRate(rateVal);
+          onRateChange(rateVal);
+        }}
         disabled={loading}
+        valueLabelDisplay="auto"
       />
     </Stack>
   );
