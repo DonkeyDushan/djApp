@@ -15,9 +15,6 @@ import {
   arp3,
   bass1,
   bass2,
-  custom1,
-  custom2,
-  custom3,
   drums1,
   drums2,
   drums3,
@@ -43,9 +40,6 @@ export const MainPage = () => {
   const [rateOverrides, setRateOverrides] = useState<{ [src: string]: number | null }>({});
 
   const [audioList, setAudioList] = useState(() => [
-    { text: 'Custom Sound 1', src: 'Custom1.mp3', audio: custom1 },
-    { text: 'Custom Sound 2', src: 'Custom2.mp3', audio: custom2 },
-    { text: 'Custom Sound 3', src: 'Custom3.mp3', audio: custom3 },
     { text: 'Funk Drums 1', src: 'Funk_Drumz1.mp3', audio: drums1 },
     { text: 'Funk Drums 2', src: 'Funk_Drumz2.mp3', audio: drums2 },
     { text: 'Funk Drums 3', src: 'Funk_Drumz3.mp3', audio: drums3 },
@@ -202,7 +196,13 @@ export const MainPage = () => {
 
   const handleAddCustomSound = (name: string, dataUrl: string) => {
     const howl = new Howl({ src: [dataUrl], loop: false });
-    setAudioList((prev) => [...prev, { text: name, src: `Custom_${name}`, audio: howl }]);
+    setAudioList((prev) => {
+      if (prev.some((a) => a.src === `Custom_${name}`)) return prev;
+      return [...prev, { text: name, src: `Custom_${name}`, audio: howl }];
+    });
+  };
+  const handleRemoveCustomSound = (name: string) => {
+    setAudioList((prev) => prev.filter((a) => a.src !== `Custom_${name}`));
   };
 
   useEffect(() => {
@@ -213,10 +213,14 @@ export const MainPage = () => {
         if (dataUrl) {
           const name = key.replace('customSound_', '');
           const howl = new Howl({ src: [dataUrl], loop: false });
-          setAudioList((prev) => [...prev, { text: name, src: `Custom_${name}`, audio: howl }]);
+          setAudioList((prev) => {
+            if (prev.some((a) => a.src === `Custom_${name}`)) return prev;
+            return [...prev, { text: name, src: `Custom_${name}`, audio: howl }];
+          });
         }
       });
   }, []);
+
   useEffect(() => {
     audioList.forEach(({ audio, src }) => {
       if (checkedValues.includes(src)) {
@@ -251,7 +255,10 @@ export const MainPage = () => {
             <Stack direction={'row'} gap={'24px'} alignItems={'center'} justifyContent={'end'}>
               <SaveDialog handleSave={saveMixToLocalStorage} />
               <LoadDialog handleSave={loadMixFromLocalStorage} />
-              <CustomSoundsDialog onAddCustomSound={handleAddCustomSound} />
+              <CustomSoundsDialog
+                onAddCustomSound={handleAddCustomSound}
+                onRemoveCustomSound={handleRemoveCustomSound}
+              />
               <Button
                 onClick={() => {
                   setCheckedValues([]);
@@ -295,12 +302,12 @@ export const MainPage = () => {
               size="medium"
               min={0.5}
               max={4}
-              step={0.025}
+              step={0.05}
               value={globalRate}
               onChange={(e, v) => handleGlobalRateChange(v as number)}
               valueLabelDisplay="auto"
             />
-            <Box>Global tempo: {globalRate.toFixed(2)}x</Box>
+            <Box sx={{ color: '#000' }}>Global tempo: {globalRate.toFixed(2)}x</Box>
           </Stack>
           <Stack direction={'row'} justifyContent={'center'} sx={{ padding: '12px' }}>
             <IconButton

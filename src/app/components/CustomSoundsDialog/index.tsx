@@ -11,7 +11,8 @@ const style = {
   left: '50%',
   display: 'grid',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 600,
+  maxWidth: '80vw',
   bgcolor: 'background.paper',
   border: '2px ridge #7d7d7d',
   boxShadow: 24,
@@ -24,8 +25,10 @@ const style = {
 
 const CustomSoundsDialog = ({
   onAddCustomSound,
+  onRemoveCustomSound,
 }: {
   onAddCustomSound: (name: string, dataUrl: string) => void;
+  onRemoveCustomSound: (name: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
   const [customSounds, setCustomSounds] = React.useState<string[]>([]);
@@ -47,9 +50,10 @@ const CustomSoundsDialog = ({
 
   const deleteSound = (soundKey: string) => {
     localStorage.removeItem(soundKey);
+    const name = soundKey.replace('customSound_', '');
+    onRemoveCustomSound(name);
     setCustomSounds((prev) => prev.filter((s) => s !== soundKey));
   };
-
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -79,7 +83,7 @@ const CustomSoundsDialog = ({
           <Button
             component="label"
             startIcon={<UploadFile />}
-            sx={{ mb: 2, fontWeight: 600, color: 'rgba(227, 61, 148, 1)' }}
+            sx={{ mb: 2, fontWeight: 600, fontSize: '1.5rem', color: '#1976d2' }}
           >
             Upload Sound
             <input

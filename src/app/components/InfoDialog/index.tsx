@@ -67,6 +67,16 @@ const InfoDialog = () => {
             }
           </li>
           <li>{'First slider: volume, second slider: speed.'}</li>
+          <li>
+            {
+              "Global tempo control: Adjusts playback speed for all recordings at once. Moving an individual track's speed slider will remove it from global tempo control until the slider matches the global value again."
+            }
+          </li>
+          <li>
+            {
+              'You can upload your own custom sounds in supported formats (MP3). Uploaded sounds are saved locally in your browser and can be deleted from the "Custom Sounds" dialog.'
+            }
+          </li>
           <li>{'You can save selected recordings, volume and speed using the "SAVE" button.'}</li>
           <li>
             {'Switching between saved tracks is smoothed out, so tracks fade into one another.'}

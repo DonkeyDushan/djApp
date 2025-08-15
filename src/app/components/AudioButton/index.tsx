@@ -99,13 +99,14 @@ const AudioButton = ({ audioObject, checked, onClick, slider, onRateChange }: Ty
         onChange={(e, v) => setVolume(v as number)}
         disabled={loading}
         valueLabelDisplay="auto"
+        valueLabelFormat={(v) => `Volume: ${v} %`}
       />
 
       <Slider
         size="small"
         min={0.5}
         max={4}
-        step={0.025}
+        step={0.05}
         value={rate}
         onChange={(e, v) => {
           const rateVal = v as number;
@@ -114,6 +115,7 @@ const AudioButton = ({ audioObject, checked, onClick, slider, onRateChange }: Ty
         }}
         disabled={loading}
         valueLabelDisplay="auto"
+        valueLabelFormat={(v) => `Tempo: ${v}x`}
       />
     </Stack>
   );
